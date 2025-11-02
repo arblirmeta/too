@@ -18,13 +18,17 @@
             background: linear-gradient(45deg, #fe9150 0%, #fe6446 100%);
         }
 
-        /* Enhanced slide animations from original */
+        /* Enhanced slide animations from original with GPU acceleration */
         .slide-in-bottom {
             animation: slideInBottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform, opacity;
+            backface-visibility: hidden;
         }
 
         .slide-out-bottom {
             animation: slideOutBottom 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+            will-change: transform, opacity;
+            backface-visibility: hidden;
         }
 
         @keyframes slideInBottom {
@@ -49,7 +53,7 @@
             height: 8px;
         }
 
-        /* Multi-stage animation keyframes */
+        /* Multi-stage animation keyframes - optimized for mobile */
         @keyframes drawCircle {
             0% { stroke-dashoffset: 157; }
             100% { stroke-dashoffset: 0; }
@@ -70,32 +74,69 @@
         }
 
         @keyframes fadeInText {
-            0% { opacity: 0; transform: translateY(10px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% { opacity: 0; transform: translate3d(0, 10px, 0); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0); }
         }
 
         @keyframes pulseRing {
             0% {
-                transform: scale(1);
+                transform: scale3d(1, 1, 1);
                 opacity: 0.9;
             }
             30% {
                 opacity: 0.6;
             }
             70% {
-                transform: scale(1.8);
+                transform: scale3d(1.8, 1.8, 1);
                 opacity: 0;
             }
             100% {
-                transform: scale(1.8);
+                transform: scale3d(1.8, 1.8, 1);
                 opacity: 0;
             }
         }
 
-        /* Ensure SVG transforms are centered */
+        /* Ensure SVG transforms are centered with GPU acceleration */
         #pulseRing1, #pulseRing2 {
             transform-box: fill-box;
             transform-origin: center;
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+        }
+
+        /* GPU acceleration for slider */
+        #slider {
+            will-change: transform;
+            backface-visibility: hidden;
+            transform: translate3d(0, 0, 0);
+        }
+
+        #fillBar {
+            will-change: width;
+            backface-visibility: hidden;
+        }
+
+        /* Touch optimization */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* SVG optimization for mobile */
+        svg {
+            will-change: auto;
+            transform: translateZ(0);
+        }
+
+        #animatedContainer svg {
+            will-change: transform;
+        }
+
+        /* Optimize modal for mobile */
+        #modalContent {
+            will-change: transform;
+            backface-visibility: hidden;
+            transform: translate3d(0, 100%, 0);
         }
     </style>
 </head>
@@ -203,7 +244,7 @@
     <!-- Modal -->
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-30 hidden z-50 transition-opacity duration-500">
         <div class="flex items-end justify-center min-h-screen pt-40">
-            <div id="modalContent" class="bg-white rounded-t-3xl w-full max-w-md p-4 transform translate-y-full material-shadow" style="height: auto; max-height: 60vh; overflow-y: visible; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);">
+            <div id="modalContent" class="bg-white rounded-t-3xl w-full max-w-md p-4 transform material-shadow" style="height: auto; max-height: 60vh; overflow-y: visible; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);">
                 <!-- Modal Header -->
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold">Abzuholende Bestellung</h2>
@@ -333,9 +374,9 @@
             modal.classList.remove('hidden');
             resetModal();
 
-            // Trigger animation after a small delay
+            // Trigger animation after a small delay with GPU acceleration
             setTimeout(() => {
-                modalContent.classList.remove('translate-y-full');
+                modalContent.style.transform = 'translate3d(0, 0, 0)';
             }, 10);
         });
 
@@ -350,7 +391,7 @@
         });
 
         function closeModalWithAnimation() {
-            modalContent.classList.add('translate-y-full');
+            modalContent.style.transform = 'translate3d(0, 100%, 0)';
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 500);
@@ -359,7 +400,7 @@
         function resetModal() {
             swipeContainer.classList.remove('hidden');
             animatedContainer.classList.add('hidden');
-            slider.style.transform = 'translateX(0px)';
+            slider.style.transform = 'translate3d(0, 0, 0)';
             fillBar.style.width = '0%';
             // Reset animations
             resetAnimations();
@@ -469,7 +510,7 @@
             const maxX = containerWidth - sliderWidth - 16;
             currentX = Math.max(0, Math.min(currentX, maxX));
 
-            slider.style.transform = `translateX(${currentX}px)`;
+            slider.style.transform = `translate3d(${currentX}px, 0, 0)`;
 
             // Update fill bar - make it shorter by limiting to slider position + radius
             const sliderCenter = currentX + (sliderWidth / 2);
@@ -498,7 +539,7 @@
                 slider.style.transition = 'transform 0.3s ease-out';
                 fillBar.style.transition = 'width 0.3s ease-out';
 
-                slider.style.transform = 'translateX(0px)';
+                slider.style.transform = 'translate3d(0, 0, 0)';
                 fillBar.style.width = '0%';
                 currentX = 0;
 
