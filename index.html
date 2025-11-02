@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunkin Bestellung</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Original App Gradients */
+        .gradient-orange-pink {
+            background: linear-gradient(45deg, #ffb200 0%, #ff578c 100%);
+        }
+
+        .gradient-orange-red {
+            background: linear-gradient(45deg, #fe9150 0%, #fe6446 100%);
+        }
+
+        /* Enhanced slide animations from original */
+        .slide-in-bottom {
+            animation: slideInBottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .slide-out-bottom {
+            animation: slideOutBottom 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+        }
+
+        @keyframes slideInBottom {
+            0% { transform: translate3d(0, 100%, 0); opacity: 0; }
+            100% { transform: translate3d(0, 0, 0); opacity: 1; }
+        }
+
+        @keyframes slideOutBottom {
+            0% { transform: translate3d(0, 0, 0); opacity: 1; }
+            100% { transform: translate3d(0, 100%, 0); opacity: 0; }
+        }
+
+        /* Material Design shadow */
+        .material-shadow {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Enhanced progress bar styling */
+        .progress-bar-enhanced {
+            background: linear-gradient(90deg, #fe9150 0%, #fe6446 100%);
+            border-radius: 28px;
+            height: 8px;
+        }
+
+        /* Multi-stage animation keyframes */
+        @keyframes drawCircle {
+            0% { stroke-dashoffset: 157; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        @keyframes fillCircle {
+            0% { r: 0; }
+            100% { r: 25; }
+        }
+
+        @keyframes drawCheckmark {
+            0% {
+                stroke-dashoffset: 26;
+            }
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes fadeInText {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseRing {
+            0% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+            30% {
+                opacity: 0.6;
+            }
+            70% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        /* Ensure SVG transforms are centered */
+        #pulseRing1, #pulseRing2 {
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-lg">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b">
+            <button class="text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <h1 class="text-lg font-semibold text-gray-900">Deine Bestellung</h1>
+            <div class="w-6"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <!-- Picked Up Status (initially hidden) -->
+            <div id="pickedUpStatus" class="hidden mb-4 bg-teal-700 text-white p-3 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span class="font-semibold">Abgeholt</span>
+            </div>
+            <!-- Dunkin Logo -->
+            <div class="text-center mb-8">
+                <img src="3048f6fcd7fc3bce5389891a160b7c42.jpg" alt="DUNKIN'" class="inline-block h-3">
+            </div>
+
+            <!-- Store Info -->
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Dunkin - Charlottenburg</h2>
+                <p class="text-gray-600 text-sm mb-4">Sophie-Charlotten-Straße 4B, 14059 Berlin, Deutschland</p>
+                <button class="text-teal-700 font-medium flex items-center justify-center mx-auto">
+                    <span>Laden finden</span>
+                    <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b mb-6">
+                <button class="flex-1 py-3 text-teal-700 border-b-2 border-teal-700 font-medium">Selber abholen</button>
+                <button class="flex-1 py-3 text-gray-500">Ask-a-Friend</button>
+            </div>
+
+            <!-- Order Details -->
+            <div class="space-y-4 mb-8">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">DATUM</span>
+                    <span class="text-gray-600">ABHOLZEIT</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium" id="currentDate">14.09.2025</span>
+                    <span class="font-medium">15:00 - 18:00</span>
+                </div>
+
+                <div class="flex justify-between mt-6">
+                    <span class="text-gray-600">ÜBERRASCHUNGSTÜTE</span>
+                    <span class="text-gray-600">GESAMTPREIS</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium">1x Donut Box</span>
+                    <span class="font-medium">5,90 €</span>
+                </div>
+            </div>
+
+            <!-- Packaging Info -->
+            <div id="orderCard" class="bg-gray-50 p-4 rounded-xl mb-6">
+                <h3 class="text-gray-600 text-sm font-medium mb-2">VERPACKUNG</h3>
+                <p class="text-gray-800 text-sm">Der Laden stellt Verpackungen für dein Essen bereit, aber wir empfehlen, eine eigene Tasche mitzubringen, um es nach Hause zu tragen.</p>
+            </div>
+
+            <!-- Pickup Info -->
+            <div class="mb-8">
+                <h3 class="text-gray-600 text-sm font-medium mb-2">INFORMATIONEN ZUR ABHOLUNG</h3>
+                <p class="text-gray-800 text-sm">Bitte klingle vorne am Eingang bei "Produktion/Warenannahme" und warte...</p>
+            </div>
+
+            <!-- Action Button -->
+            <button id="openModalButton" class="w-full bg-teal-700 text-white py-4 rounded-2xl font-semibold text-lg">
+                Zum Abholen tippen
+            </button>
+
+            <!-- Reminder Button -->
+            <button class="w-full mt-4 text-teal-700 font-medium flex items-center justify-center">
+                <span>Erinnerung erhalten</span>
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7V3a1 1 0 011-1h4a1 1 0 011 1v4"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Help Button -->
+        <div class="fixed bottom-6 right-6">
+            <button class="bg-white rounded-full p-3 shadow-lg border">
+                <span class="text-xl">?</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-30 hidden z-50 transition-opacity duration-500">
+        <div class="flex items-end justify-center min-h-screen pt-40">
+            <div id="modalContent" class="bg-white rounded-t-3xl w-full max-w-md p-4 transform translate-y-full material-shadow" style="height: auto; max-height: 60vh; overflow-y: visible; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Abzuholende Bestellung</h2>
+                    <button id="closeModal" class="text-gray-500 text-2xl">×</button>
+                </div>
+
+                <!-- Order Circle -->
+                <div class="text-center mb-4">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-teal-700 text-white rounded-full text-lg font-semibold">
+                        1x
+                    </div>
+                </div>
+
+                <!-- Order Info -->
+                <div class="text-center mb-4">
+                    <h3 class="text-base font-semibold mb-1">Donut Box</h3>
+                    <p class="text-gray-600 text-sm">Dunkin - Charlottenburg</p>
+                </div>
+
+                <!-- Order ID -->
+                <div class="text-center mb-4">
+                    <div class="inline-block bg-teal-700 text-white px-3 py-1 rounded-lg font-mono text-xs">
+                        TJOFPNZKB00M0
+                    </div>
+                    <hr class="border-gray-200 my-3 mx-4">
+                    <p class="text-gray-500 text-xs px-4">
+                        Zeige den Beleg im Laden vor und swipe den Balken unten. Bitte achte darauf, erst zu swipen, wenn du im Laden bist und bereit bist deine Bestellung entgegenzunehmen.
+                    </p>
+                </div>
+
+                <!-- State 1: Swipe Container -->
+                <div id="swipeContainer" class="mb-6 px-8">
+                    <div class="relative bg-gray-200 rounded-full h-14 overflow-hidden">
+                        <div id="fillBar" class="absolute left-0 top-0 bottom-0 bg-teal-700 rounded-full" style="width: 0%; transition: none;"></div>
+                        <div class="absolute inset-0 flex items-center justify-center font-medium z-10" style="color: rgb(15 118 110);">
+                            Zum Entwerten swipen
+                        </div>
+                        <div id="slider" class="absolute left-2 top-2 w-10 h-10 bg-teal-700 rounded-full flex items-center justify-center text-white cursor-grab z-20">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- State 2 & 3: Animated Loading & Success -->
+                <div id="animatedContainer" class="mb-6 hidden">
+                    <div class="flex flex-col items-center">
+                        <!-- Multi-stage SVG Animation -->
+                        <div class="mb-4">
+                            <svg width="100" height="100" viewBox="0 0 100 100" class="transform">
+                                <!-- Stage A: Circle outline drawing -->
+                                <circle id="circleOutline" cx="50" cy="50" r="25"
+                                        fill="none"
+                                        stroke="rgb(15 118 110)"
+                                        stroke-width="2"
+                                        stroke-dasharray="157"
+                                        stroke-dashoffset="157"
+                                        style="animation: drawCircle 1.2s ease-out forwards;">
+                                </circle>
+
+                                <!-- Stage B: Circle fill -->
+                                <circle id="circleFill" cx="50" cy="50" r="0"
+                                        fill="rgb(15 118 110)"
+                                        style="animation: fillCircle 0.8s ease-out 1.2s forwards;">
+                                </circle>
+
+                                <!-- Stage C: Checkmark drawing -->
+                                <path id="checkmark" d="M39 50 L47 58 L61 44"
+                                      fill="none"
+                                      stroke="white"
+                                      stroke-width="2.5"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-dasharray="26"
+                                      stroke-dashoffset="26"
+                                      style="animation: drawCheckmark 0.8s ease-out 2.0s forwards;">
+                                </path>
+
+                                <!-- Stage E: Pulsing rings -->
+                                <circle id="pulseRing1" cx="50" cy="50" r="19"
+                                        fill="none"
+                                        stroke="rgb(15 118 110)"
+                                        stroke-width="1.5"
+                                        opacity="0"
+                                        style="animation: pulseRing 2s ease-out 2.8s infinite;">
+                                </circle>
+
+                                <circle id="pulseRing2" cx="50" cy="50" r="19"
+                                        fill="none"
+                                        stroke="rgb(15 118 110)"
+                                        stroke-width="1.5"
+                                        opacity="0"
+                                        style="animation: pulseRing 2s ease-out 4.8s infinite;">
+                                </circle>
+                            </svg>
+                        </div>
+
+                        <!-- Stage D: Text fade in -->
+                        <div id="successText" class="text-center opacity-0" style="animation: fadeInText 0.5s ease-out 2.6s forwards;">
+                            <h3 class="text-xl font-semibold text-teal-700 mb-4">Abholung bestätigt</h3>
+                            <p class="text-gray-600">Zeige dies im Laden vor, um deine Bestellung entgegenzunehmen!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('modal');
+        const modalContent = document.getElementById('modalContent');
+        const openModalButton = document.getElementById('openModalButton');
+        const closeModal = document.getElementById('closeModal');
+        const swipeContainer = document.getElementById('swipeContainer');
+        const animatedContainer = document.getElementById('animatedContainer');
+        const slider = document.getElementById('slider');
+        const fillBar = document.getElementById('fillBar');
+
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+        let sliderWidth = 0;
+        let containerWidth = 0;
+
+        openModalButton.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            resetModal();
+
+            // Trigger animation after a small delay
+            setTimeout(() => {
+                modalContent.classList.remove('translate-y-full');
+            }, 10);
+        });
+
+        closeModal.addEventListener('click', () => {
+            closeModalWithAnimation();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModalWithAnimation();
+            }
+        });
+
+        function closeModalWithAnimation() {
+            modalContent.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 500);
+        }
+
+        function resetModal() {
+            swipeContainer.classList.remove('hidden');
+            animatedContainer.classList.add('hidden');
+            slider.style.transform = 'translateX(0px)';
+            fillBar.style.width = '0%';
+            // Reset animations
+            resetAnimations();
+            // Show instruction text again
+            document.querySelector('.text-gray-500.text-xs').style.display = 'block';
+            // Reset order card state
+            resetOrderCardState();
+        }
+
+        function resetOrderCardState() {
+            // Hide picked up status
+            const pickedUpStatus = document.getElementById('pickedUpStatus');
+            pickedUpStatus.classList.add('hidden');
+
+            // Reset order card background to gray
+            const orderCard = document.getElementById('orderCard');
+            orderCard.classList.remove('bg-teal-700', 'text-white');
+            orderCard.classList.add('bg-gray-50');
+
+            // Show the pickup button again
+            const openModalButton = document.getElementById('openModalButton');
+            openModalButton.style.display = 'block';
+        }
+
+        function resetAnimations() {
+            const circleOutline = document.getElementById('circleOutline');
+            const circleFill = document.getElementById('circleFill');
+            const checkmark = document.getElementById('checkmark');
+            const successText = document.getElementById('successText');
+            const pulseRing1 = document.getElementById('pulseRing1');
+            const pulseRing2 = document.getElementById('pulseRing2');
+
+            // Reset all animations
+            if (circleOutline) circleOutline.style.animation = 'none';
+            if (circleFill) circleFill.style.animation = 'none';
+            if (checkmark) checkmark.style.animation = 'none';
+            if (successText) successText.style.animation = 'none';
+            if (pulseRing1) pulseRing1.style.animation = 'none';
+            if (pulseRing2) pulseRing2.style.animation = 'none';
+
+            // Reset styles
+            setTimeout(() => {
+                if (circleOutline) {
+                    circleOutline.style.strokeDashoffset = '157';
+                    circleOutline.style.animation = 'drawCircle 1.2s ease-out forwards';
+                }
+                if (circleFill) {
+                    circleFill.setAttribute('r', '0');
+                    circleFill.setAttribute('cx', '50');
+                    circleFill.setAttribute('cy', '50');
+                    circleFill.style.animation = 'fillCircle 0.8s ease-out 1.2s forwards';
+                }
+                if (checkmark) {
+                    checkmark.style.strokeDashoffset = '26';
+                    checkmark.style.animation = 'drawCheckmark 0.8s ease-out 2.0s forwards';
+                }
+                if (successText) {
+                    successText.style.opacity = '0';
+                    successText.style.animation = 'fadeInText 0.5s ease-out 2.6s forwards';
+                }
+                if (pulseRing1) {
+                    pulseRing1.style.opacity = '0';
+                    pulseRing1.style.transform = 'scale(1)';
+                    pulseRing1.style.animation = 'pulseRing 2s ease-out 2.8s infinite';
+                }
+                if (pulseRing2) {
+                    pulseRing2.style.opacity = '0';
+                    pulseRing2.style.transform = 'scale(1)';
+                    pulseRing2.style.animation = 'pulseRing 2s ease-out 4.8s infinite';
+                }
+            }, 50);
+        }
+
+        function initSlider() {
+            const container = slider.parentElement;
+            containerWidth = container.offsetWidth;
+            sliderWidth = slider.offsetWidth;
+        }
+
+        slider.addEventListener('mousedown', startDrag);
+        slider.addEventListener('touchstart', startDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            initSlider();
+
+            if (e.type === 'mousedown') {
+                startX = e.clientX;
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', endDrag);
+            } else {
+                startX = e.touches[0].clientX;
+                document.addEventListener('touchmove', drag);
+                document.addEventListener('touchend', endDrag);
+            }
+
+            slider.style.cursor = 'grabbing';
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+
+            const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+            currentX = clientX - startX;
+
+            const maxX = containerWidth - sliderWidth - 16;
+            currentX = Math.max(0, Math.min(currentX, maxX));
+
+            slider.style.transform = `translateX(${currentX}px)`;
+
+            // Update fill bar - make it shorter by limiting to slider position + radius
+            const sliderCenter = currentX + (sliderWidth / 2);
+            const fillWidth = (sliderCenter / containerWidth) * 100;
+            fillBar.style.width = Math.min(fillWidth, 100) + '%';
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+
+            isDragging = false;
+            slider.style.cursor = 'grab';
+
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', endDrag);
+
+            const maxX = containerWidth - sliderWidth - 16;
+            const threshold = maxX * 0.8;
+
+            if (currentX >= threshold) {
+                completeSwipe();
+            } else {
+                // Add smooth transition for reset
+                slider.style.transition = 'transform 0.3s ease-out';
+                fillBar.style.transition = 'width 0.3s ease-out';
+
+                slider.style.transform = 'translateX(0px)';
+                fillBar.style.width = '0%';
+                currentX = 0;
+
+                // Remove transition after reset
+                setTimeout(() => {
+                    slider.style.transition = 'none';
+                    fillBar.style.transition = 'none';
+                }, 300);
+            }
+        }
+
+        function completeSwipe() {
+            // Hide instruction text
+            document.querySelector('.text-gray-500.text-xs').style.display = 'none';
+
+            // Start the multi-stage animation immediately
+            swipeContainer.classList.add('hidden');
+            animatedContainer.classList.remove('hidden');
+
+            // Reset and start animations
+            resetAnimations();
+
+            // Update background order card state
+            updateOrderCardState();
+        }
+
+        function updateOrderCardState() {
+            // Show picked up status
+            const pickedUpStatus = document.getElementById('pickedUpStatus');
+            pickedUpStatus.classList.remove('hidden');
+
+            // Change order card background to green
+            const orderCard = document.getElementById('orderCard');
+            orderCard.classList.remove('bg-gray-50');
+            orderCard.classList.add('bg-teal-700', 'text-white');
+
+            // Hide the pickup button
+            const openModalButton = document.getElementById('openModalButton');
+            openModalButton.style.display = 'none';
+        }
+
+        window.addEventListener('resize', initSlider);
+
+        // Set current date
+        function setCurrentDate() {
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            const formattedDate = `${day}.${month}.${year}`;
+            document.getElementById('currentDate').textContent = formattedDate;
+        }
+
+        // Initialize date on page load
+        setCurrentDate();
+    </script>
+</body>
+</html>
